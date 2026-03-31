@@ -1,16 +1,9 @@
-# flutter_food_tracker_app
+## flutter_food_tracker_app with Flutter/Dart
 
-A new Flutter project.
+## แอปการติดตามอาหาร
 
-## Getting Started
+<kbd><img width="300" alt="localhost_62505_(iPhone 14 Pro Max)" src="https://github.com/user-attachments/assets/5df9d2a4-5c17-4463-9112-3136ba3e2a41" /></kbd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<kbd><img width="300" alt="localhost_62505_(iPhone 14 Pro Max) (1)" src="https://github.com/user-attachments/assets/e8bb17a6-d51e-4e91-9883-c926e4a3bacb" />
+</kbd>
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
