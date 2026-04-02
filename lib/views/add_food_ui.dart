@@ -14,13 +14,13 @@ class AddFoodUi extends StatefulWidget {
 }
 
 class _AddFoodUiState extends State<AddFoodUi> {
-  // สร้างตัวควบคุม textfield และตัวแปรที่ต้องเก็บข้อมูลตอนป้อนหรือเลือก เพื่อบันทึกไว้ใน task_tb
+  // สร้างตัวควบคุม textfield และตัวแปรที่ต้องเก็บข้อมูลตอนป้อนหรือเลือก เพื่อบันทึกไว้ใน food_tb
   TextEditingController foodNameController = TextEditingController();
   TextEditingController foodPriceController = TextEditingController();
   TextEditingController foodPersonController = TextEditingController();
   String? foodMeal = 'เช้า';
   TextEditingController foodDateController = TextEditingController();
-  String? foodImageUrl = " ";
+  String? foodImageUrl = "";
 
   // ตัวแปรเก็บไฟล์ที่ใช้อัพโหลด
   File? file;
@@ -46,14 +46,71 @@ class _AddFoodUiState extends State<AddFoodUi> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-    // เอาค่าวันที่เลือกจากปกิทินไปกำหนดให้กับ taskDuedatecontroller
+    // เอาค่าวันที่เลือกจากปกิทินไปกำหนดให้กับ foodDuedatecontroller
     if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-        foodDateController.text =
-            DateFormat('yyyy-MM-dd').format(selectedDate!);
-      });
+      setState(
+        () {
+          selectedDate = picked;
+          foodDateController.text =
+              DateFormat('yyyy-MM-dd').format(selectedDate!);
+        },
+      );
     }
+  }
+
+  // เมธอดอัปโหลดไฟล์และบันทึกข้อมูล
+  Future<void> save() async {
+    // varidate ui ว่าผู้ใช้งานป้อนข้อมูลต่างๆครบมั้ย
+    if (foodNameController.text.isEmpty ||
+        foodPriceController.text.isEmpty ||
+        foodPersonController.text.isEmpty ||
+        foodDateController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('กรุณากรอกข้อมูลให้ครบ'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // สร้าง instance/object/ตัวแทนของ supabease service เพื่อใช้งานเมธอดต่างๆ ที่สร้างไว้ใน SupabaseService
+    final service = SupabaseService();
+
+    // ตรวจสอบว่ามีการถ่าย/เลือกรูปมั้ย ถ้ามีก็อัปโหลดไฟล์ไปยัง tasl_bk
+    // แล้วเอา URL ของไฟล์ที่อัปโหลดเก็บในตัวแปรเพื่อใช้บันทึกใน food_tb
+    if (file != null) {
+      // หาก file ไม่เท่ากับ null แปลว่าได้มีการถ่ายภาพ/เลือกรูป
+      // อัปโหลดไฟล์ไปยัง food_bk
+      foodImageUrl = await service.uploadFile(file!);
+    }
+
+    // บันทึกข้อมูลง food_tb
+    // แพ็กข้อมูล
+    final food = Food(
+      foodName: foodNameController.text,
+      foodPrice: int.parse(foodPriceController.text),
+      foodPerson: int.parse(foodPersonController.text),
+      foodDate: foodDateController.text,
+      foodMeal: foodMeal,
+      foodImageUrl: foodImageUrl,
+    );
+
+    // เรียกใช้เมธอด insetFood ใน SupabaseService เพื่อบันทึกข้อมูลลงไปใน supabase
+    await service.insetFood(food);
+
+    // แจ้งผลการทำงาน (แสดงเป็น snackbar หรือ alertdialog)
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('บันทึกข้อมูลสำเร็จ'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    // ย้อนกลับไปหน้าหลัก ShowAllFoodUi
+    Navigator.pop(context);
   }
 
   @override
@@ -62,7 +119,7 @@ class _AddFoodUiState extends State<AddFoodUi> {
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
         title: Text(
-          'Food Tracker (Add Task)',
+          'Food Tracker (Add Food)',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -309,20 +366,7 @@ class _AddFoodUiState extends State<AddFoodUi> {
                 // ปุ่มบันทึก
                 ElevatedButton(
                   onPressed: () {
-                    // ตรวจสอบว่ามีข้อมูลหรือไม่
-                    if (foodNameController.text.length == 0 ||
-                        foodPriceController.text.length == 0 ||
-                        foodPersonController.text.length == 0 ||
-                        foodDateController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('กรุณากรอกข้อมูลให้ครบ'),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                      return;
-                    }
+                    save();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_food_tracker_app/model/food.dart';
 import 'package:flutter_food_tracker_app/services/supabase_service.dart';
 import 'package:flutter_food_tracker_app/views/add_food_ui.dart';
+import 'package:flutter_food_tracker_app/views/update_delete_ui.dart';
 
 class ShowAllFoodUi extends StatefulWidget {
   const ShowAllFoodUi({super.key});
@@ -55,7 +56,10 @@ class _ShowAllFoodUiState extends State<ShowAllFoodUi> {
             MaterialPageRoute(
               builder: (context) => AddFoodUi(),
             ),
-          );
+          ).then((value) {
+            // เมื่อกลับมาจากหน้า AddFood Ui ให้โหลดข้อมูลใหม่เพื่อแสดงอัปเดตล่าสุด
+            loadFoods();
+          });
         },
         child: Icon(
           Icons.add,
@@ -96,7 +100,22 @@ class _ShowAllFoodUiState extends State<ShowAllFoodUi> {
                       right: 20,
                     ),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        // เปิดไปหน้า UpdateDeleteFoodUi แบบย้อนหลับได้
+                        // และจะมีการส่งข้อมูลที่ถูกกับไปหน้า UpdateDeleteFoodUi
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UpdateDeleteUi(
+                              food: foods[index],
+                            ),
+                          ),
+                        ).then(
+                          (value) {
+                            loadFoods();
+                          },
+                        );
+                      },
                       leading: foods[index].foodImageUrl! != ''
                           ? Image.network(
                               foods[index].foodImageUrl!,
